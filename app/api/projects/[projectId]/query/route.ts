@@ -32,10 +32,10 @@ interface QueryResponse {
 
 export async function POST(
   request: NextRequest,
-  context: { params: { projectId: string } }
+  context: { params: Promise<{ projectId: string }> }
 ) {
   // Extract projectId safely
-  const { projectId: _projectId } = context.params;
+  const { projectId: _projectId } = await context.params;
   let projectId = _projectId;
   
   try {
