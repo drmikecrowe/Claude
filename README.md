@@ -76,18 +76,38 @@ interface QdrantRelationship {
 
 ## Installation
 
+### Quick Setup (Recommended)
+
 1. **Clone the repository:**
    ```bash
    git clone <your-repository-url>
    cd mcp-knowledge-graph
    ```
 
-2. **Install dependencies:**
+2. **Run automated setup:**
+   ```bash
+   npm run setup
+   ```
+   This will:
+   - Install dependencies
+   - Create `.env.local` from template
+   - Build TypeScript and Next.js
+   - Start Qdrant database (Podman/Docker)
+
+3. **Configure environment:**
+   Edit `.env.local` and add your OpenAI API key:
+   ```env
+   OPENAI_API_KEY=sk-your-actual-key-here
+   ```
+
+### Manual Setup (Alternative)
+
+1. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. **Environment Configuration:**
+2. **Environment Configuration:**
    Create a `.env.local` file with:
    ```env
    # Qdrant Configuration
@@ -102,13 +122,16 @@ interface QdrantRelationship {
    UI_API_PORT=4000
    ```
 
-4. **Start Qdrant Database:**
+3. **Start Qdrant Database:**
    ```bash
-   # Using Docker
-   docker run -p 6333:6333 qdrant/qdrant
+   # Using Podman (preferred)
+   podman run -d --name qdrant -p 127.0.0.1:6333:6333 -p 127.0.0.1:6334:6334 -v ./qdrant_storage:/qdrant/storage:z docker.io/qdrant/qdrant
+   
+   # Or using Docker
+   docker run -d -p 6333:6333 -p 6334:6334 -v ./qdrant_storage:/qdrant/storage:z qdrant/qdrant
    ```
 
-5. **Build the application:**
+4. **Build the application:**
    ```bash
    npm run preparepackage
    ```
@@ -121,9 +144,10 @@ interface QdrantRelationship {
 ```bash
 npm run start:all
 ```
-This starts both:
-- Next.js UI server on `http://localhost:4000`
-- API server with MCP integration on `http://localhost:3155`
+This starts:
+- Qdrant database (if not running)
+- Unified server with UI on `http://localhost:4000`
+- MCP server integrated in the same process
 
 **Individual Services:**
 ```bash
@@ -308,12 +332,23 @@ Configure your MCP-compatible AI client (e.g., Claude Desktop) with:
 
 ## Troubleshooting
 
-### Common Issues
+### Quick Fixes
 
 1. **Port Conflicts**: Change `UI_API_PORT` if default ports are occupied
 2. **Qdrant Connection**: Ensure Qdrant is running on configured port
 3. **OpenAI API**: Verify API key and rate limits
-4. **Build Errors**: Run `npm run build:server` before starting
+4. **Build Errors**: Run `npm run preparepackage` before starting
+
+### Comprehensive Troubleshooting
+
+For detailed setup troubleshooting based on real user experiences, see [SETUP_TROUBLESHOOTING.md](SETUP_TROUBLESHOOTING.md).
+
+This guide covers:
+- Container runtime issues (Podman/Docker)
+- Environment configuration problems
+- Build process failures
+- Network connectivity issues
+- Authentication and API key problems
 
 ### Logs
 - Application logs via Winston logger

@@ -7,25 +7,34 @@
 
 ## Setup (5 minutes)
 
-1. **Clone and setup:**
+1. **Clone and install:**
    ```bash
    git clone <your-repo>
    cd mcp-knowledge-graph
+   npm install
+   ```
+
+2. **Setup environment:**
+   Create `.env.local` file (copy from `.env.local.example` if available):
+   ```env
+   QDRANT_URL=http://localhost:6333
+   OPENAI_API_KEY=sk-your-actual-key-here
+   NODE_ENV=development
+   UI_API_PORT=4000
+   ```
+
+3. **Run automated setup:**
+   ```bash
    npm run setup
    ```
+   This will build the application and start Qdrant database.
 
-2. **Configure environment:**
-   Edit `.env.local` and add your OpenAI API key:
-   ```env
-   OPENAI_API_KEY=sk-your-actual-key-here
-   ```
-
-3. **Start the server:**
+4. **Start the server:**
    ```bash
    npm run start:all
    ```
 
-4. **Access the dashboard:**
+5. **Access the dashboard:**
    Open http://localhost:4000 in your browser
 
 ## Using with Claude Desktop (No Port Conflicts!)
@@ -59,10 +68,25 @@ Run diagnostics:
 npm run diagnose
 ```
 
-Common issues:
+Common issues and solutions:
+
+**Qdrant Connection Issues:**
+- If using Podman, ensure container binds to 127.0.0.1:
+  ```bash
+  podman run -d --name qdrant -p 127.0.0.1:6333:6333 -p 127.0.0.1:6334:6334 -v ./qdrant_storage:/qdrant/storage:z docker.io/qdrant/qdrant
+  ```
+- Check Qdrant health: `curl -s http://localhost:6333/health`
+- Check running containers: `podman ps` or `docker ps`
+
+**Build Issues:**
+- Run `npm run preparepackage` before starting
+- Ensure TypeScript builds successfully: `npm run build:server`
+- For permission issues with volumes, add `:z` flag to volume mounts
+
+**Environment Setup:**
 - **Port in use**: Change `UI_API_PORT` in `.env.local`
-- **Qdrant not starting**: Ensure Docker is running
-- **No embeddings**: Add OpenAI API key to `.env.local`
+- **Missing .env.local**: Copy from `.env.local.example` if available
+- **No embeddings**: Add valid OpenAI API key to `.env.local`
 
 ## Example Usage
 
