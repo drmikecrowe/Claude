@@ -92,7 +92,7 @@ interface QdrantRelationship {
    - Install dependencies
    - Create `.env.local` from template
    - Build TypeScript and Next.js
-   - Start Qdrant database (Docker)
+   - Start Qdrant database (Podman/Docker)
 
 3. **Configure environment:**
    Edit `.env.local` and add your OpenAI API key:
@@ -124,8 +124,18 @@ interface QdrantRelationship {
 
 3. **Start Qdrant Database:**
    ```bash
-   # Using Docker
-   docker run -d -p 6333:6333 -p 6334:6334 -v ./qdrant_storage:/qdrant/storage qdrant/qdrant
+   # Using Podman (preferred on Linux)
+   podman run -d --name qdrant \
+     -p 127.0.0.1:6333:6333 \
+     -p 127.0.0.1:6334:6334 \
+     -v ./qdrant_storage:/qdrant/storage:z \
+     docker.io/qdrant/qdrant
+
+   # Or using Docker
+   docker run -d --name qdrant \
+     -p 6333:6333 -p 6334:6334 \
+     -v ./qdrant_storage:/qdrant/storage \
+     qdrant/qdrant
    ```
 
 4. **Build the application:**
@@ -341,7 +351,7 @@ Configure your MCP-compatible AI client (e.g., Claude Desktop) with:
 For detailed setup troubleshooting based on real user experiences, see [SETUP_TROUBLESHOOTING.md](SETUP_TROUBLESHOOTING.md).
 
 This guide covers:
-- Docker container issues
+- Container runtime issues (Podman/Docker)
 - Environment configuration problems
 - Build process failures
 - Network connectivity issues

@@ -11,14 +11,20 @@ fi
 
 echo "✅ Node.js $(node --version) detected"
 
-# Check if Docker is installed
-if ! command -v docker &> /dev/null; then
-    echo "❌ Docker is not installed. Please install Docker to run Qdrant."
-    echo "   Visit: https://docs.docker.com/get-docker/"
+# Check for container runtime (Podman preferred, Docker fallback)
+CONTAINER_RUNTIME=""
+if command -v podman &> /dev/null; then
+    CONTAINER_RUNTIME="podman"
+    echo "✅ Podman detected"
+elif command -v docker &> /dev/null; then
+    CONTAINER_RUNTIME="docker"
+    echo "✅ Docker detected"
+else
+    echo "❌ Neither Podman nor Docker is installed. Please install one to run Qdrant."
+    echo "   Podman: https://podman.io/getting-started/installation"
+    echo "   Docker: https://docs.docker.com/get-docker/"
     exit 1
 fi
-
-echo "✅ Docker detected"
 
 # Check if .env.local exists
 if [ ! -f .env.local ]; then
@@ -40,8 +46,12 @@ npm run build:server
 # Check if Qdrant is running
 echo "🔍 Checking Qdrant status..."
 if ! curl -s http://localhost:6333/health > /dev/null 2>&1; then
-    echo "🐳 Starting Qdrant..."
-    npm run start:qdrant
+    echo "🐳 Starting Qdrant with $CONTAINER_RUNTIME..."
+    if [ "$CONTAINER_RUNTIME" = "podman" ]; then
+        npm run start:qdrant:podman
+    else
+        npm run start:qdrant
+    fi
     sleep 5
 else
     echo "✅ Qdrant is already running"

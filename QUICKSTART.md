@@ -71,17 +71,21 @@ npm run diagnose
 Common issues and solutions:
 
 **Qdrant Connection Issues:**
-- Ensure Docker container is properly running:
+- Ensure container is properly running:
   ```bash
+  # Podman (preferred on Linux)
+  podman run -d --name qdrant -p 127.0.0.1:6333:6333 -p 127.0.0.1:6334:6334 -v ./qdrant_storage:/qdrant/storage:z docker.io/qdrant/qdrant
+  
+  # Docker (alternative)
   docker run -d --name qdrant -p 6333:6333 -p 6334:6334 -v ./qdrant_storage:/qdrant/storage qdrant/qdrant
   ```
 - Check Qdrant health: `curl -s http://localhost:6333/health`
-- Check running containers: `docker ps`
+- Check running containers: `podman ps` or `docker ps`
 
 **Build Issues:**
 - Run `npm run preparepackage` before starting
 - Ensure TypeScript builds successfully: `npm run build:server`
-- For volume permission issues, check Docker daemon permissions
+- For permission issues with volumes, add `:z` flag for SELinux systems (Podman)
 
 **Environment Setup:**
 - **Port in use**: Change `UI_API_PORT` in `.env.local`
