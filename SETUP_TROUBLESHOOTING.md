@@ -31,25 +31,18 @@ EOF
    npm run build         # Next.js build
    ```
 
-## Container Runtime Issues
+## Docker Container Issues
 
-### 3. Podman vs Docker Configuration
+### 3. Docker Configuration
 **Problem:** Qdrant container binding issues or container not accessible
 
-**Podman (Recommended):**
+**Docker Setup:**
 ```bash
-# Correct binding to localhost
-podman run -d --name qdrant \
-  -p 127.0.0.1:6333:6333 \
-  -p 127.0.0.1:6334:6334 \
-  -v ./qdrant_storage:/qdrant/storage:z \
-  docker.io/qdrant/qdrant
-```
-
-**Docker (Alternative):**
-```bash
-docker run -d -p 6333:6333 -p 6334:6334 \
-  -v ./qdrant_storage:/qdrant/storage:z \
+# Standard Docker setup
+docker run -d --name qdrant \
+  -p 6333:6333 \
+  -p 6334:6334 \
+  -v ./qdrant_storage:/qdrant/storage \
   qdrant/qdrant
 ```
 
@@ -57,9 +50,9 @@ docker run -d -p 6333:6333 -p 6334:6334 \
 **Problem:** Volume mount failures or permission denied
 
 **Solutions:**
-- Add `:z` flag to volume mounts for SELinux systems
 - Create storage directory first: `mkdir -p qdrant_storage`
-- Check container logs: `podman logs [container-name]`
+- Check Docker daemon permissions
+- Check container logs: `docker logs [container-name]`
 
 ## Network and Port Issues
 
@@ -75,7 +68,7 @@ sudo netstat -lnpt | grep 4000
 **Solutions:**
 - Stop conflicting services
 - Change `UI_API_PORT` in `.env.local`
-- For Qdrant, stop existing container: `podman stop qdrant && podman rm qdrant`
+- For Qdrant, stop existing container: `docker stop qdrant && docker rm qdrant`
 
 ### 6. Qdrant Health Check Failures
 **Problem:** Application can't connect to Qdrant
@@ -89,8 +82,8 @@ curl -s http://localhost:6333/health
 curl -4 -v http://127.0.0.1:6333/
 
 # Check container status
-podman ps
-podman logs qdrant
+docker ps
+docker logs qdrant
 ```
 
 ## Script and Command Issues
@@ -137,7 +130,7 @@ npm run preparepackage       # Runs both builds
 **Usage pattern from history:**
 ```bash
 op run npm -- run start:prod
-op run podman -- run [podman-command]
+op run docker -- run [docker-command]
 ```
 
 ## Advanced Troubleshooting
@@ -145,13 +138,13 @@ op run podman -- run [podman-command]
 ### Container Management
 ```bash
 # Stop all Qdrant containers
-podman ps -q --filter 'ancestor=docker.io/qdrant/qdrant' | xargs -r podman stop
+docker ps -q --filter 'ancestor=qdrant/qdrant' | xargs -r docker stop
 
 # Remove stopped containers
-podman container prune
+docker container prune
 
 # Check container resource usage
-podman stats qdrant
+docker stats qdrant
 ```
 
 ### Log Analysis
@@ -160,10 +153,10 @@ podman stats qdrant
 tail -f logs/application.log   # If exists
 
 # Container logs
-podman logs --tail 20 qdrant
+docker logs --tail 20 qdrant
 
 # System logs for container issues
-journalctl -u podman --since "1 hour ago"
+journalctl -u docker --since "1 hour ago"
 ```
 
 ### Network Debugging
@@ -191,7 +184,7 @@ Based on successful user experience, the working setup flow is:
 1. **Clean slate approach:**
    ```bash
    # Stop and remove containers
-   podman stop qdrant && podman rm qdrant
+   docker stop qdrant && docker rm qdrant
    
    # Clean build artifacts
    rm -rf dist .next node_modules
@@ -203,7 +196,7 @@ Based on successful user experience, the working setup flow is:
 
 2. **Check system requirements:**
    - Node.js 18+
-   - Podman or Docker installed and running
+   - Docker installed and running
    - Sufficient disk space for Qdrant storage
    - Network access for npm packages and OpenAI API
 
