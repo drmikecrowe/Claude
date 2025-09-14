@@ -96,21 +96,21 @@ Common issues and solutions:
 
 1. **Create a project:**
    - Click "New Project" in the dashboard
-   - Or use MCP: `create_project project_id:"my-project" name:"My Project"`
+   - Or use MCP: `create_project projectId:"my-project" name:"My Project"`
 
 2. **Add entities:**
    ```
-   create_entity project_id:"my-project" name:"User Model" type:"class" description:"Main user data model"
+   create_entity projectId:"my-project" name:"User Model" type:"class" description:"Main user data model"
    ```
 
 3. **Create relationships:**
    ```
-   create_relationship project_id:"my-project" source_id:"entity-1" target_id:"entity-2" type:"uses"
+   create_relationship projectId:"my-project" source_id:"entity-1" target_id:"entity-2" type:"uses"
    ```
 
 4. **Search semantically:**
    ```
-   vector_search project_id:"my-project" query:"authentication components" limit:5
+   vector_search projectId:"my-project" query:"authentication components" limit:5
    ```
 
 ## Features

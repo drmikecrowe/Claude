@@ -192,7 +192,7 @@ lib/models/ContextSession.ts             // Session state management
 -- KuzuDB Extensions
 CREATE TABLE Conversations (
   id UUID PRIMARY KEY,
-  project_id UUID,
+  projectId UUID,
   session_id STRING,
   user_message TEXT,
   ai_response TEXT,
@@ -203,7 +203,7 @@ CREATE TABLE Conversations (
 
 CREATE TABLE ContextSessions (
   id UUID PRIMARY KEY,
-  project_id UUID,
+  projectId UUID,
   user_id STRING,
   last_active TIMESTAMP,
   session_summary TEXT,
@@ -246,7 +246,7 @@ export const contextTools = [
     description: "Extract entities from conversation text automatically",
     inputSchema: {
       text: "string",
-      project_id: "string"
+      projectId: "string"
     }
   },
   {

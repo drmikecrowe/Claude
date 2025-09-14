@@ -42,11 +42,11 @@ interface RequestHandlerExtra {
   sessionId?: string;
 }
 
-// --- Define Tool Schemas (Adding project_id where needed) ---
+// --- Define Tool Schemas (Adding projectId where needed) ---
 
 // 1. create_entity
 const createEntitySchemaDef = {
-  project_id: z.string().describe("The ID of the project context for this operation."),
+  projectId: z.string().describe("The ID of the project context for this operation."),
   name: z.string().describe("The primary name or identifier of the entity (e.g., 'src/components/Button.tsx', 'calculateTotal', 'UserAuthenticationFeature')."),
   type: z.string().describe("The classification of the entity (e.g., 'file', 'function', 'class', 'variable', 'module', 'concept', 'feature', 'requirement')."),
   description: z.string().describe("A brief description of the entity's purpose or role."),
@@ -56,7 +56,7 @@ const createEntitySchemaDef = {
 
 // 2. create_relationship
 const createRelationshipSchemaDef = {
-  project_id: z.string().describe("The ID of the project context for this operation."),
+  projectId: z.string().describe("The ID of the project context for this operation."),
   source_id: z.string().describe("The unique ID of the source entity."),
   target_id: z.string().describe("The unique ID of the target entity."),
   type: z.string().describe("The type of relationship (e.g., 'calls', 'contains', 'implements', 'related_to')."),
@@ -65,26 +65,26 @@ const createRelationshipSchemaDef = {
 
 // 3. add_observation
 const addObservationSchemaDef = {
-  project_id: z.string().describe("The ID of the project context for this operation."),
+  projectId: z.string().describe("The ID of the project context for this operation."),
   entity_id: z.string().describe("The unique ID of the entity to add the observation to."),
   observation: z.string().describe("The textual observation to add.")
 };
 
 // 4. get_entity
 const getEntitySchemaDef = {
-  project_id: z.string().describe("The ID of the project context for this operation."),
+  projectId: z.string().describe("The ID of the project context for this operation."),
   entity_id: z.string().describe("The unique ID of the entity to retrieve.")
 };
 
 // 5. list_entities
 const listEntitiesSchemaDef = {
-    project_id: z.string().describe("The ID of the project context for this operation."),
+    projectId: z.string().describe("The ID of the project context for this operation."),
     type: z.string().optional().describe("Optional filter to list entities only of a specific type.")
 };
 
 // 6. get_related_entities
 const getRelatedEntitiesSchemaDef = {
-    project_id: z.string().describe("The ID of the project context for this operation."),
+    projectId: z.string().describe("The ID of the project context for this operation."),
     entity_id: z.string().describe("The ID of the entity to find related entities for."),
     relationship_type: z.string().optional().describe("Optional filter by relationship type."),
     direction: z.enum(['incoming', 'outgoing', 'both']).optional().default('both').describe("Direction of relationships to consider ('incoming', 'outgoing', 'both'). Default is 'both'.")
@@ -92,7 +92,7 @@ const getRelatedEntitiesSchemaDef = {
 
 // 7. get_relationships
 const getRelationshipsSchemaDef = {
-    project_id: z.string().describe("The ID of the project context for this operation."),
+    projectId: z.string().describe("The ID of the project context for this operation."),
     entity_id: z.string().describe("The ID of the entity to get relationships for."),
     relationship_type: z.string().optional().describe("Optional filter by relationship type."),
     direction: z.enum(['incoming', 'outgoing', 'both']).optional().default('both').describe("Direction of relationships to consider ('incoming', 'outgoing', 'both'). Default is 'both'.")
@@ -100,26 +100,26 @@ const getRelationshipsSchemaDef = {
 
 // 8. update_entity_description
 const updateEntityDescriptionSchemaDef = {
-    project_id: z.string().describe("The ID of the project context for this operation."),
+    projectId: z.string().describe("The ID of the project context for this operation."),
     entity_id: z.string().describe("The unique ID of the entity to update."),
     description: z.string().describe("The new description for the entity.")
 };
 
 // 9. delete_entity
 const deleteEntitySchemaDef = {
-    project_id: z.string().describe("The ID of the project context for this operation."),
+    projectId: z.string().describe("The ID of the project context for this operation."),
     entity_id: z.string().describe("The unique ID of the entity to delete.")
 };
 
 // 10. delete_relationship
 const deleteRelationshipSchemaDef = {
-    project_id: z.string().describe("The ID of the project context for this operation."),
+    projectId: z.string().describe("The ID of the project context for this operation."),
     relationship_id: z.string().describe("The unique ID of the relationship to delete.")
 };
 
 // 11. delete_observation
 const deleteObservationSchemaDef = {
-    project_id: z.string().describe("The ID of the project context for this operation."),
+    projectId: z.string().describe("The ID of the project context for this operation."),
     entity_id: z.string().describe("The ID of the entity the observation belongs to."),
     observation_id: z.string().describe("The unique ID of the observation to delete.")
 };
@@ -197,7 +197,7 @@ const createEntityHandler = async (args: ToolArgs<typeof createEntitySchemaDef>)
       name: args.name,
       type: args.type,
       description: args.description,
-      projectId: args.project_id,
+      projectId: args.projectId,
       metadata: { 
         parentId: args.parentId,
         observations: observationsArray.map((text, index) => ({
@@ -236,7 +236,7 @@ const createRelationshipHandler = async (args: ToolArgs<typeof createRelationshi
       targetId: args.target_id,
       type: args.type,
       description: args.description,
-      projectId: args.project_id,
+      projectId: args.projectId,
       strength: 1.0,
       metadata: {}
     });
@@ -264,7 +264,7 @@ const addObservationHandler = async (args: ToolArgs<typeof addObservationSchemaD
     await qdrantDataService.initialize();
     
     // Get current entity
-    const entity = await qdrantDataService.getEntity(args.project_id, args.entity_id);
+    const entity = await qdrantDataService.getEntity(args.projectId, args.entity_id);
     if (!entity) {
       return {
         content: [{ type: "text" as const, text: "Error: Entity not found." }],
@@ -281,7 +281,7 @@ const addObservationHandler = async (args: ToolArgs<typeof addObservationSchemaD
     };
     observations.push(newObservation);
     
-    await qdrantDataService.updateEntity(args.project_id, args.entity_id, {
+    await qdrantDataService.updateEntity(args.projectId, args.entity_id, {
       metadata: { ...entity.metadata, observations }
     });
 
@@ -298,7 +298,7 @@ const addObservationHandler = async (args: ToolArgs<typeof addObservationSchemaD
 const getEntityHandler = async (args: ToolArgs<typeof getEntitySchemaDef>) => {
   try {
     await qdrantDataService.initialize();
-    const qEntity = await qdrantDataService.getEntity(args.project_id, args.entity_id);
+    const qEntity = await qdrantDataService.getEntity(args.projectId, args.entity_id);
     
     if (!qEntity) {
       return {
@@ -329,7 +329,7 @@ const getEntityHandler = async (args: ToolArgs<typeof getEntitySchemaDef>) => {
 const listEntitiesHandler = async (args: ToolArgs<typeof listEntitiesSchemaDef>) => {
   try {
     await qdrantDataService.initialize();
-    let qEntities = await qdrantDataService.getEntitiesByProject(args.project_id, 1000);
+    let qEntities = await qdrantDataService.getEntitiesByProject(args.projectId, 1000);
     
     if (args.type) {
       qEntities = qEntities.filter(entity => entity.type === args.type);
@@ -359,7 +359,7 @@ const getRelatedEntitiesHandler = async (args: ToolArgs<typeof getRelatedEntitie
     await qdrantDataService.initialize();
     
     // Get relationships for this entity
-    const relationships = await qdrantDataService.getRelationshipsByEntity(args.project_id, args.entity_id);
+    const relationships = await qdrantDataService.getRelationshipsByEntity(args.projectId, args.entity_id);
     
     // Filter by relationship type if specified
     const filteredRelationships = args.relationship_type 
@@ -386,7 +386,7 @@ const getRelatedEntitiesHandler = async (args: ToolArgs<typeof getRelatedEntitie
     // Get the actual entities
     const relatedEntities: Entity[] = [];
     for (const relatedId of relatedEntityIds) {
-      const qEntity = await qdrantDataService.getEntity(args.project_id, relatedId);
+      const qEntity = await qdrantDataService.getEntity(args.projectId, relatedId);
       if (qEntity) {
         relatedEntities.push({
           id: qEntity.id,
@@ -414,7 +414,7 @@ const getRelationshipsHandler = async (args: ToolArgs<typeof getRelationshipsSch
     await qdrantDataService.initialize();
     
     // Get relationships for this entity
-    let relationships = await qdrantDataService.getRelationshipsByEntity(args.project_id, args.entity_id);
+    let relationships = await qdrantDataService.getRelationshipsByEntity(args.projectId, args.entity_id);
     
     // Filter by relationship type if specified
     if (args.relationship_type) {
@@ -453,7 +453,7 @@ const updateEntityDescriptionHandler = async (args: ToolArgs<typeof updateEntity
   try {
     await qdrantDataService.initialize();
     
-    await qdrantDataService.updateEntity(args.project_id, args.entity_id, {
+    await qdrantDataService.updateEntity(args.projectId, args.entity_id, {
       description: args.description
     });
 
@@ -470,7 +470,7 @@ const updateEntityDescriptionHandler = async (args: ToolArgs<typeof updateEntity
 const deleteEntityHandler = async (args: ToolArgs<typeof deleteEntitySchemaDef>) => {
   try {
     await qdrantDataService.initialize();
-    await qdrantDataService.deleteEntity(args.project_id, args.entity_id);
+    await qdrantDataService.deleteEntity(args.projectId, args.entity_id);
     return { content: [{ type: "text" as const, text: "Entity deleted successfully." }] };
   } catch (error) {
     console.error("Error in deleteEntityHandler:", error);
@@ -484,7 +484,7 @@ const deleteEntityHandler = async (args: ToolArgs<typeof deleteEntitySchemaDef>)
 const deleteRelationshipHandler = async (args: ToolArgs<typeof deleteRelationshipSchemaDef>) => {
   try {
     await qdrantDataService.initialize();
-    await qdrantDataService.deleteRelationship(args.project_id, args.relationship_id);
+    await qdrantDataService.deleteRelationship(args.projectId, args.relationship_id);
     return { content: [{ type: "text" as const, text: "Relationship deleted successfully." }] };
   } catch (error) {
     console.error("Error in deleteRelationshipHandler:", error);
@@ -500,7 +500,7 @@ const deleteObservationHandler = async (args: ToolArgs<typeof deleteObservationS
     await qdrantDataService.initialize();
     
     // Get current entity
-    const entity = await qdrantDataService.getEntity(args.project_id, args.entity_id);
+    const entity = await qdrantDataService.getEntity(args.projectId, args.entity_id);
     if (!entity) {
       return {
         content: [{ type: "text" as const, text: "Error: Entity not found." }],
@@ -519,7 +519,7 @@ const deleteObservationHandler = async (args: ToolArgs<typeof deleteObservationS
       };
     }
     
-    await qdrantDataService.updateEntity(args.project_id, args.entity_id, {
+    await qdrantDataService.updateEntity(args.projectId, args.entity_id, {
       metadata: { ...entity.metadata, observations: filteredObservations }
     });
 

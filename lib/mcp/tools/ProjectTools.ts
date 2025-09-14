@@ -27,7 +27,7 @@ const listProjectsSchemaDef = {};
 
 // 3. delete_project
 const deleteProjectSchemaDef = {
-  project_id: z.string().describe("The ID of the project to delete."),
+  projectId: z.string().describe("The ID of the project to delete."),
 };
 
 // --- Define Tool Handlers ---
@@ -71,10 +71,10 @@ const listProjectsHandler = async (_args: ToolArgs<typeof listProjectsSchemaDef>
 
 const deleteProjectHandler = async (args: ToolArgs<typeof deleteProjectSchemaDef>) => {
   try {
-    const success = await deleteProjectDb(args.project_id);
+    const success = await deleteProjectDb(args.projectId);
     if (!success) {
       return {
-        content: [{ type: "text" as const, text: `Error: Project with ID ${args.project_id} not found or could not be deleted.` }],
+        content: [{ type: "text" as const, text: `Error: Project with ID ${args.projectId} not found or could not be deleted.` }],
         isError: true
       };
     }
@@ -135,12 +135,12 @@ export function getProjectToolInfo(_sessionManager: SessionManager) { // session
       inputSchema: { 
         type: "object", 
         properties: {
-          project_id: {
+          projectId: {
             type: "string",
             description: "The ID of the project to delete."
           }
         }, 
-        required: ["project_id"] 
+        required: ["projectId"] 
       }
     }
   ];

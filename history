@@ -1,0 +1,84 @@
+l
+npm i
+nvim .env.local
+cat .env.local
+podman run -p 6333:6333 qdrant/qdrant
+which warp
+which warp-terminal
+search warp-terminal
+warp-terminal --version
+warp-terminal --help
+podman run -p 6333:6333 qdrant/qdrant
+podman run -p 6333:6333 docker.io/qdrant/qdrant
+npm run preparepackage
+npm run preparepackage
+npm run setup
+npm run start:all
+npm run preparepackage
+nvim Dockerfile
+podman build -t claude .
+podman build -t mcp-knowledge-graph .
+podman build -f Dockerfile.temp -t mcp-knowledge-graph .
+git status
+git reset --hard origin/main
+git pull
+git checkout ai-working-code
+podman build -f Dockerfile.temp -t mcp-knowledge-graph .
+npm run preparepackage
+npm i
+jq .scripts package.json
+op run npm start-all
+op run npm -- start-all
+op run npm -- run start-all
+git checkout main
+op run npm -- run preparepackage
+npm i
+npm i
+op run npm -- run preparepackage
+cursor .
+podman stop qdrant
+podman list
+podman ls
+podman
+podman ps
+podman stop sweet_haslett
+./setup.sh
+bash setup.sh
+op run npm -- run start:prod
+mkdir qdrant_storage
+op run npm -- run start:prod
+cursor ~/.shell.d/init/10-1password.sh
+source  ~/.shell.d/init/10-1password.sh
+op run podman -- run -d -p 6333:6333 -p 6334:6334 -v ./qdrant_storage:/qdrant/storage:z docker.io/qdrant/qdrant
+podman logs e928226fc0129419d5d7c95e5022c6c5428b8b33750f4e3b2a65de871b990775
+op run npm -- run start:prod
+podman ps
+netstat -lnpt | rg podm
+sudo netstat -lnpt | rg podm
+sudo netstat -lnpt | rg 6333
+cat .env.local
+op run npm -- run start:prod
+op run npm -- run start:prod
+curl -s http://localhost:6333/health
+podman ps
+netstat -tlnp | grep 6333
+podman logs --tail 20 e928226fc012
+curl -v http://localhost:6333/
+curl -4 -v http://127.0.0.1:6333/
+curl -s http://127.0.0.1:6333/health
+podman ps
+podman stop admiring_kowalevski
+podman stop e928226fc012
+podman rm e928226fc012
+podman run -d --name qdrant -p 127.0.0.1:6333:6333 -p 127.0.0.1:6334:6334 -v ./qdrant_storage:/qdrant/storage:z docker.io/qdrant/qdrant
+sleep 3 && curl -s http://localhost:6333/ | jq .
+op run npm -- run start:prod
+bash setup.sh
+op run npm -- run start:prod
+source /home/mcrowe/Applications/cursor/extracted/usr/share/cursor/resources/app/out/vs/workbench/contrib/terminal/common/scripts/shellIntegration-rc.zsh
+git remote set-url origin git@github.com:drmikecrowe/Memora.git
+git merge main
+rsyncFolder . /tmp/Memora
+cd ..
+atuin history list --cmd-only -c
+atuin history list --cmd-only -c > /tmp/Memora/history

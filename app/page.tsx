@@ -1,79 +1,96 @@
-import React from 'react';
-import Link from 'next/link';
-import { Users, Library, Workflow, Settings, Brain } from 'lucide-react';
-import { Button } from "../components/ui/button";
-import ProjectCard from "../components/ProjectCard";
-import StatCard from "../components/StatCard";
-import EnhancedStatCard from "../components/EnhancedStatCard";
-import EnhancedProjectCard from "../components/EnhancedProjectCard";
-import AnimatedDashboardHeader from "../components/AnimatedDashboardHeader";
-import ActivityFeed from "../components/ActivityFeed";
-import { ContextDashboard } from "../components/ui/ContextDashboard";
-import { NaturalLanguageQuery } from "../components/ui/NaturalLanguageQuery";
-import { SmartSuggestionsPanel } from "../components/ui/SmartSuggestionsPanel";
+import React from "react"
+import Link from "next/link"
+import { Users, Library, Workflow, Settings, Brain } from "lucide-react"
+import { Button } from "../components/ui/button"
+import ProjectCard from "../components/ProjectCard"
+import StatCard from "../components/StatCard"
+import EnhancedStatCard from "../components/EnhancedStatCard"
+import EnhancedProjectCard from "../components/EnhancedProjectCard"
+import AnimatedDashboardHeader from "../components/AnimatedDashboardHeader"
+import ActivityFeed from "../components/ActivityFeed"
+import { ContextDashboard } from "../components/ui/ContextDashboard"
+import { NaturalLanguageQuery } from "../components/ui/NaturalLanguageQuery"
+import { SmartSuggestionsPanel } from "../components/ui/SmartSuggestionsPanel"
 
-import { getProjectsAction } from './actions/knowledgeGraphActions';
-import { settingsService } from '../lib/services/SettingsService';
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { getProjectsAction } from "./actions/knowledgeGraphActions"
+import { settingsService } from "../lib/services/SettingsService"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
+
+// Force dynamic rendering to avoid build-time API calls
+export const dynamic = "force-dynamic"
 
 // Define Project type based on action return type (adjust if needed)
 interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  createdAt: string;
-  lastAccessed?: string;
-  entityCount?: number;
-  relationshipCount?: number;
-  activityScore?: number;
-  status?: 'new' | 'active' | 'archived';
+  id: string
+  name: string
+  description?: string
+  createdAt: string
+  lastAccessed?: string
+  entityCount?: number
+  relationshipCount?: number
+  activityScore?: number
+  status?: "new" | "active" | "archived"
 }
 
 // Make the component async to fetch data
 export default async function DashboardPage() {
+  // Fetch projects using the server action with timeout and fallback
+  let projects: Project[] = []
+  let fetchError = null
 
-  // Fetch projects using the server action
-  let projects: Project[] = [];
-  let fetchError = null;
+  // Try to fetch projects with timeout and fallback
   try {
-    const fetchedProjects = await getProjectsAction();
+    // Add timeout to prevent hanging during build
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("API timeout")), 3000)
+    })
+
+    const fetchPromise = getProjectsAction()
+    const fetchedProjects = await Promise.race([fetchPromise, timeoutPromise])
+
     projects = (fetchedProjects || []).map((p, index) => ({
       ...p,
       entityCount: Math.floor(Math.random() * 50) + 10,
       relationshipCount: Math.floor(Math.random() * 100) + 20,
       activityScore: Math.floor(Math.random() * 100) + 20,
-      status: index === 0 ? 'new' : 'active',
-    }));
+      status: index === 0 ? ("new" as const) : ("active" as const),
+    }))
   } catch (error) {
-    console.error("Error fetching projects for dashboard:", error);
-    fetchError = "Failed to load projects.";
+    console.error("Error fetching projects for dashboard:", error)
+    // Use sample data as fallback
     projects = [
       {
-        id: 'sample-1',
-        name: 'Sample Project',
-        description: 'A sample project for demonstration',
+        id: "sample-1",
+        name: "Sample Project",
+        description: "A sample project for demonstration",
         createdAt: new Date().toISOString(),
         lastAccessed: new Date().toISOString(),
         entityCount: 30,
         relationshipCount: 50,
         activityScore: 75,
-        status: 'active',
-      }
-    ];
-    fetchError = null;
+        status: "active" as const,
+      },
+    ]
+    fetchError = null
   }
 
   // Fetch user settings to check AI feature availability
-  let userSettings;
+  let userSettings
   try {
-    userSettings = await settingsService.getUserSettings('default-user');
+    // Add timeout for settings fetch as well
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error("Settings API timeout")), 2000)
+    })
+
+    const settingsPromise = settingsService.getUserSettings("default-user")
+    userSettings = await Promise.race([settingsPromise, timeoutPromise])
   } catch (error) {
-    console.error("Error fetching user settings:", error);
-    userSettings = null;
+    console.error("Error fetching user settings:", error)
+    userSettings = null
   }
 
   // Check which AI features are enabled
-  const aiEnabled = userSettings?.aiConfiguration?.enabled ?? false;
+  const aiEnabled = userSettings?.aiConfiguration?.enabled ?? false
   const aiFeatures = userSettings?.aiFeatures ?? {
     naturalLanguageQuery: false,
     smartEntityExtraction: false,
@@ -81,20 +98,20 @@ export default async function DashboardPage() {
     conversationAnalysis: false,
     conflictResolution: false,
     knowledgeGapDetection: false,
-    contextPrediction: false
-  };
+    contextPrediction: false,
+  }
 
   // Check if any AI features are enabled for Context Intelligence section
-  const hasAnyAIFeatures = aiEnabled && (
-    aiFeatures.naturalLanguageQuery ||
-    aiFeatures.intelligentSuggestions ||
-    aiFeatures.conversationAnalysis ||
-    aiFeatures.contextPrediction
-  );
+  const hasAnyAIFeatures =
+    aiEnabled &&
+    (aiFeatures.naturalLanguageQuery ||
+      aiFeatures.intelligentSuggestions ||
+      aiFeatures.conversationAnalysis ||
+      aiFeatures.contextPrediction)
 
   // Placeholder stats (replace with real data fetching if available)
-  const totalEntities = projects.reduce((sum, p) => sum + (p.entityCount || 0), 0) || 157;
-  const totalRelationships = projects.reduce((sum, p) => sum + (p.relationshipCount || 0), 0) || 342;
+  const totalEntities = projects.reduce((sum, p) => sum + (p.entityCount || 0), 0) || 157
+  const totalRelationships = projects.reduce((sum, p) => sum + (p.relationshipCount || 0), 0) || 342
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -103,15 +120,11 @@ export default async function DashboardPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                MCP Knowledge Graph Dashboard
-              </h1>
-              <p className="text-slate-600">
-                Manage your knowledge graphs with context intelligence and AI-powered insights.
-              </p>
+              <h1 className="text-2xl font-bold text-slate-900 mb-2">MCP Knowledge Graph Dashboard</h1>
+              <p className="text-slate-600">Manage your knowledge graphs with context intelligence and AI-powered insights.</p>
             </div>
-            <Link 
-              href="/settings" 
+            <Link
+              href="/settings"
               className="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors duration-200"
             >
               <Settings className="h-4 w-4" />
@@ -123,9 +136,9 @@ export default async function DashboardPage() {
 
         {/* Enhanced Statistics Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <EnhancedStatCard 
-            title="Total Projects" 
-            value={projects.length} 
+          <EnhancedStatCard
+            title="Total Projects"
+            value={projects.length}
             iconName="Library"
             description="Active projects in your workspace"
             color="slate"
@@ -133,20 +146,20 @@ export default async function DashboardPage() {
             trend="up"
             trendValue={12}
           />
-          <EnhancedStatCard 
-            title="Total Entities" 
+          <EnhancedStatCard
+            title="Total Entities"
             value={totalEntities}
-            iconName="Users" 
+            iconName="Users"
             description="Knowledge entities across projects"
             color="emerald"
             delay={0.1}
             trend="up"
             trendValue={8}
           />
-          <EnhancedStatCard 
-            title="Total Relationships" 
+          <EnhancedStatCard
+            title="Total Relationships"
             value={totalRelationships}
-            iconName="Workflow" 
+            iconName="Workflow"
             description="Connections between entities"
             color="indigo"
             delay={0.2}
@@ -163,42 +176,42 @@ export default async function DashboardPage() {
               {/* Natural Language Query - Only show if enabled */}
               {aiFeatures.naturalLanguageQuery && (
                 <div className="lg:col-span-2">
-                  <NaturalLanguageQuery 
+                  <NaturalLanguageQuery
                     allProjects={projects}
-                    projectId={projects[0]?.id || 'default'}
-                    className="h-full min-h-[250px]"
-                  />
-                </div>
-              )}
-              
-              {/* Smart Suggestions - Only show if enabled */}
-              {aiFeatures.intelligentSuggestions && (
-                <div className={aiFeatures.naturalLanguageQuery ? "lg:col-span-1" : "lg:col-span-3"}>
-                  <SmartSuggestionsPanel 
-                    projectId={projects[0]?.id || 'default'}
+                    projectId={projects[0]?.id || "default"}
                     className="h-full min-h-[250px]"
                   />
                 </div>
               )}
 
-              {/* If only one AI feature is enabled and it's not natural language query, make it span more columns */}
-              {!aiFeatures.naturalLanguageQuery && !aiFeatures.intelligentSuggestions && (aiFeatures.conversationAnalysis || aiFeatures.contextPrediction) && (
-                <div className="lg:col-span-3">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Brain className="h-5 w-5 text-indigo-600" />
-                        Context Analysis
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-slate-600">
-                        Advanced context analysis features are enabled. AI will analyze your conversations and predict relevant context.
-                      </p>
-                    </CardContent>
-                  </Card>
+              {/* Smart Suggestions - Only show if enabled */}
+              {aiFeatures.intelligentSuggestions && (
+                <div className={aiFeatures.naturalLanguageQuery ? "lg:col-span-1" : "lg:col-span-3"}>
+                  <SmartSuggestionsPanel projectId={projects[0]?.id || "default"} className="h-full min-h-[250px]" />
                 </div>
               )}
+
+              {/* If only one AI feature is enabled and it's not natural language query, make it span more columns */}
+              {!aiFeatures.naturalLanguageQuery &&
+                !aiFeatures.intelligentSuggestions &&
+                (aiFeatures.conversationAnalysis || aiFeatures.contextPrediction) && (
+                  <div className="lg:col-span-3">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <Brain className="h-5 w-5 text-indigo-600" />
+                          Context Analysis
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-slate-600">
+                          Advanced context analysis features are enabled. AI will analyze your conversations and predict relevant
+                          context.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                )}
             </div>
           </div>
         ) : (
@@ -208,11 +221,10 @@ export default async function DashboardPage() {
               <CardContent className="py-8">
                 <div className="text-center">
                   <Brain className="h-12 w-12 mx-auto mb-4 text-slate-300" />
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                    AI Features Available
-                  </h3>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-2">AI Features Available</h3>
                   <p className="text-slate-600 mb-4 max-w-md mx-auto">
-                    Enable AI-powered features like natural language queries, smart suggestions, and context intelligence to unlock the full potential of your knowledge graphs.
+                    Enable AI-powered features like natural language queries, smart suggestions, and context intelligence to unlock
+                    the full potential of your knowledge graphs.
                   </p>
                   <Button asChild variant="outline" className="border-slate-200 text-slate-600 hover:bg-slate-50">
                     <Link href="/settings">
@@ -230,10 +242,7 @@ export default async function DashboardPage() {
         {projects.length > 0 && (aiFeatures.conversationAnalysis || aiFeatures.contextPrediction) && (
           <div className="mb-8">
             <h2 className="text-xl font-semibold text-slate-900 mb-6">Recent Context</h2>
-            <ContextDashboard 
-              projectId={projects[0].id}
-              className="lg:grid-cols-3"
-            />
+            <ContextDashboard projectId={projects[0].id} className="lg:grid-cols-3" />
           </div>
         )}
 
@@ -251,13 +260,11 @@ export default async function DashboardPage() {
             </div>
 
             {fetchError ? (
-              <div className="text-center text-red-600 py-8">
-                {fetchError}
-              </div>
+              <div className="text-center text-red-600 py-8">{fetchError}</div>
             ) : projects.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {projects.slice(0, 4).map((project, index) => ( 
-                  <EnhancedProjectCard 
+                {projects.slice(0, 4).map((project, index) => (
+                  <EnhancedProjectCard
                     key={project.id}
                     id={project.id}
                     name={project.name}
@@ -266,7 +273,7 @@ export default async function DashboardPage() {
                     entityCount={project.entityCount || 0}
                     relationshipCount={project.relationshipCount || 0}
                     activityScore={project.activityScore || 0}
-                    status={project.status || 'active'}
+                    status={project.status || "active"}
                     delay={0.3 + index * 0.1}
                   />
                 ))}
@@ -288,5 +295,5 @@ export default async function DashboardPage() {
         </div>
       </div>
     </div>
-  );
+  )
 }
